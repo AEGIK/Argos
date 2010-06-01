@@ -53,10 +53,8 @@ public class ArgosDeserializer
                 return readMap((int)readUnsignedInteger(1));
             case ArgosProtocol.MAP_MAX_65535:
                 return readMap((int)readUnsignedInteger(2));
-            case ArgosProtocol.SYMBOL_ID_MAX_255:
-                return readSymbol((int)readUnsignedInteger(1));
-            case ArgosProtocol.SYMBOL_ID_MAX_65535:
-                return readSymbol((int)readUnsignedInteger(2));
+            case ArgosProtocol.SYMBOL_ID_2E_12D:
+                return readSymbol(ArgosProtocol.SYMBOL_ID_2D - ArgosProtocol.SYMBOL_ID_00 + 1 + (int)readUnsignedInteger(1));
             case ArgosProtocol.DOUBLE_ZERO:
                 return 0.0d;
             case ArgosProtocol.DOUBLE:
@@ -86,33 +84,38 @@ public class ArgosDeserializer
 
     private Object handleRange(int prefix) throws IOException
     {
-        if (prefix >= ArgosProtocol.ZERO && prefix <= ArgosProtocol.FOURTEEN)
+        if (prefix >= ArgosProtocol.INT_00 && prefix <= ArgosProtocol.INT_7F)
         {
-            return (long)prefix - ArgosProtocol.ZERO;
+            return (long)prefix - ArgosProtocol.INT_00;
         }
         else if (prefix >= ArgosProtocol.ONE_BYTE_INTEGER && prefix <= ArgosProtocol.EIGHT_BYTES_INTEGER)
         {
-            return readInteger(prefix - ArgosProtocol.ONE_BYTE_INTEGER + 1);
+            long value = readInteger(prefix - ArgosProtocol.ONE_BYTE_INTEGER + 1);
+            if (prefix == ArgosProtocol.ONE_BYTE_INTEGER && value >= 0)
+            {
+                return value + 128;
+            }
+            return value;
         }
-        else if (prefix >= ArgosProtocol.STRING_LEN_ZERO && prefix <= ArgosProtocol.STRING_LEN_TEN)
+        else if (prefix >= ArgosProtocol.STRING_LEN_00 && prefix <= ArgosProtocol.STRING_LEN_0D)
         {
-            return readString(prefix - ArgosProtocol.STRING_LEN_ZERO);
+            return readString(prefix - ArgosProtocol.STRING_LEN_00);
         }
-        else if (prefix >= ArgosProtocol.ARRAY_LEN_ZERO && prefix <= ArgosProtocol.ARRAY_LEN_TEN)
+        else if (prefix >= ArgosProtocol.ARRAY_LEN_00 && prefix <= ArgosProtocol.ARRAY_LEN_0D)
         {
-            return readArray(prefix - ArgosProtocol.ARRAY_LEN_ZERO);
+            return readArray(prefix - ArgosProtocol.ARRAY_LEN_00);
         }
-        else if (prefix >= ArgosProtocol.MAP_LEN_ZERO && prefix <= ArgosProtocol.MAP_LEN_TEN)
+        else if (prefix >= ArgosProtocol.MAP_LEN_00 && prefix <= ArgosProtocol.MAP_LEN_0D)
         {
-            return readMap(prefix - ArgosProtocol.MAP_LEN_ZERO);
+            return readMap(prefix - ArgosProtocol.MAP_LEN_00);
         }
         else if (prefix >= ArgosProtocol.SYMBOL_ID_00 && prefix <= ArgosProtocol.SYMBOL_ID_2D)
         {
             return readSymbol(prefix - ArgosProtocol.SYMBOL_ID_00);
         }
-        else if (prefix >= ArgosProtocol.BYTE_ARRAY_LEN_ZERO && prefix <= ArgosProtocol.BYTE_ARRAY_LEN_TEN)
+        else if (prefix >= ArgosProtocol.BYTE_ARRAY_LEN_00 && prefix <= ArgosProtocol.BYTE_ARRAY_LEN_0D)
         {
-            return readBytes(prefix - ArgosProtocol.BYTE_ARRAY_LEN_ZERO);
+            return readBytes(prefix - ArgosProtocol.BYTE_ARRAY_LEN_00);
         }
         throw new IOException("Unknown type: " + prefix);
     }

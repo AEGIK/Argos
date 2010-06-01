@@ -6,15 +6,13 @@ package com.aegik.argos;
  */
 
 import junit.framework.*;
-import com.aegik.argos.ArgosSerializer;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.util.*;
 import java.text.SimpleDateFormat;
 
-public class ArgosSerializerTest extends TestCase
+@SuppressWarnings({"unchecked"}) public class ArgosSerializerTest extends TestCase
 {
     char[] HEX = "0123456789ABCDEF".toCharArray();
     ArgosSerializer m_argosSerializer;
@@ -22,7 +20,7 @@ public class ArgosSerializerTest extends TestCase
 
     public void setUp()
     {
-        m_argosSerializer = new ArgosSerializer(258);
+        m_argosSerializer = new ArgosSerializer();
         m_argosDeserializer = new ArgosDeserializer();
     }
 
@@ -48,6 +46,7 @@ public class ArgosSerializerTest extends TestCase
         printLength(map);
         printLength(Arrays.asList(1, 20, 255, 1000, 65536));
         printLength(Arrays.asList(11, 33, 0, 55, -11));
+        printLength(1.0);
     }
     private String toHex(byte[] bytes)
     {
@@ -97,7 +96,8 @@ public class ArgosSerializerTest extends TestCase
         m_argosSerializer.begin().add(o);
         byte[] bytes = m_argosSerializer.serialize();
         ByteArrayInputStream stream = new ByteArrayInputStream(bytes);
-        assertEquals("Stream was: " + toHex(bytes), o, m_argosDeserializer.deserialize(stream));
+        Object result = m_argosDeserializer.deserialize(stream);
+        assertEquals(result + ": Stream was: " + toHex(bytes), o, result);
     }
 
     public void testAddBytes() throws Exception
@@ -166,6 +166,7 @@ public class ArgosSerializerTest extends TestCase
         assertSerialization(0.0);
         assertSerialization(1.0);
     }
+
     public void testAddList() throws Exception
     {
         List<Object> list = new ArrayList<Object>();
@@ -187,22 +188,28 @@ public class ArgosSerializerTest extends TestCase
         for (int i = 0; i < 250; i++)
         {
             newList.add(-(long) i * i);
+            assertSerialization(newList);
         }
-        assertSerialization(newList);
     }
 
     public void testAddInt() throws Exception
     {
-        for (int i = 0; i <= 14; i++)
+        for (int i = 0; i <= 127; i++)
         {
             m_argosSerializer.begin().add(i);
-            compareBytes("1" + HEX[i]);
+            compareBytes(toHex(i));
             assertEquals((long)i, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
         }
         m_argosSerializer.begin().add(-1);
-        compareBytes("1F");
+        compareBytes("87");
         assertEquals(-1L, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
-        for (int i = 1; i <= 8; i++)
+        m_argosSerializer.begin().add(255);
+        compareBytes("887F");
+        m_argosSerializer.begin().add(-128);
+        compareBytes("8880");
+        m_argosSerializer.begin().add(128);
+        compareBytes("8800");
+        for (int i = 2; i <= 8; i++)
         {
             long valueMax = (1L << (8 * (i - 1) + 7)) - 1;
             long valueMin = -(1L << (8 * (i - 1) + 7));
@@ -214,10 +221,10 @@ public class ArgosSerializerTest extends TestCase
                 maxHex += "FF";
             }
             m_argosSerializer.begin().add(valueMax);
-            compareBytes("2" + HEX[i] + maxHex);
+            compareBytes("8" + HEX[i + 7] + maxHex);
             assertEquals(valueMax, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
             m_argosSerializer.begin().add(valueMin);
-            compareBytes("2" + HEX[i] + minHex);
+            compareBytes("8" + HEX[i + 7] + minHex);
             assertEquals(valueMin, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
         }
     }
@@ -226,7 +233,7 @@ public class ArgosSerializerTest extends TestCase
     {
         String test = "";
         String result = "";
-        for (int i = 0; i <= 10; i++)
+        for (int i = 0; i <= 13; i++)
         {
             if (i > 0)
             {
@@ -234,20 +241,20 @@ public class ArgosSerializerTest extends TestCase
                 result += toHex(HEX[i]);
             }
             m_argosSerializer.begin().add(test);
-            compareBytes("3" + HEX[i] + result);
+            compareBytes("9" + HEX[i] + result);
             assertSerialization(test);
         }
-        test += HEX[11];
-        result += toHex(HEX[11]);
+        test += HEX[14];
+        result += toHex(HEX[14]);
         m_argosSerializer.begin().add(test);
-        compareBytes("3B0B" + result);
+        compareBytes("9E0E" + result);
         assertSerialization(test);
     }
 
     public void testAddBoolean() throws Exception
     {
         m_argosSerializer.begin().add(true).add(false);
-        compareBytes("0102");
+        compareBytes("8180");
         assertEquals(true, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
         m_argosSerializer.begin().add(false);
         assertEquals(false, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
@@ -255,9 +262,9 @@ public class ArgosSerializerTest extends TestCase
     public void testAddNull() throws Exception
     {
         m_argosSerializer.begin().add(null);
-        compareBytes("00");
+        compareBytes("EF");
         m_argosSerializer.begin().add(null).add(null);
-        compareBytes("0000");
+        compareBytes("EFEF");
         assertEquals(null, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
 
     }

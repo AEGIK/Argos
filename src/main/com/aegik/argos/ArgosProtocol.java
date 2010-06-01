@@ -7,43 +7,43 @@ package com.aegik.argos;
  */
 public interface ArgosProtocol
 {
-    int NULL = 0x00;
-    int TRUE = 0x01;
-    int FALSE = 0x02;
-    int ZERO = 0x10;
-    int FOURTEEN = 0x1E;
-    int MINUS_ONE = 0x1F;
-    int ONE_BYTE_INTEGER = 0x21;
-    int EIGHT_BYTES_INTEGER = 0x28;
-    int STRING_LEN_ZERO = 0x30;
-    int STRING_LEN_TEN = 0x3A;
-    int STRING_LEN_MAX_255 = 0x3B;
-    int STRING_LEN_MAX_65535 = 0x3C;
+    int INT_00 = 0x00;
+    int INT_7F = 0x7F;
 
-    int ARRAY_LEN_ZERO = 0x40;
-    int ARRAY_LEN_TEN = 0x4A;
-    int ARRAY_MAX_255 = 0x4B;
-    int ARRAY_MAX_65535 = 0x4C;
+    int FALSE = 0x80;
+    int TRUE = 0x81;
+    int DOUBLE_ZERO = 0x82;
+    int DOUBLE = 0x83;
+    int DATE_MS = 0x84;
+    int DATE_S = 0x85;
+    int DATE_H = 0x86;
+    int MINUS_ONE = 0x87;
+    int ONE_BYTE_INTEGER = 0x88;
+    int EIGHT_BYTES_INTEGER = 0x8F;
 
-    int MAP_LEN_ZERO = 0x50;
-    int MAP_LEN_TEN = 0x5A;
-    int MAP_MAX_255 = 0x5B;
-    int MAP_MAX_65535 = 0x5C;
+    int STRING_LEN_00 = 0x90;
+    int STRING_LEN_0D = 0x9D;
+    int STRING_LEN_MAX_255 = 0x9E;
+    int STRING_LEN_MAX_65535 = 0x9F;
 
-    int SYMBOL_ID_00 = 0x60;
-    int SYMBOL_ID_2D = 0x8D;
-    int SYMBOL_ID_MAX_255 = 0x8E;
-    int SYMBOL_ID_MAX_65535 = 0x8F;
+    int ARRAY_LEN_00 = 0xA0;
+    int ARRAY_LEN_0D = 0xAD;
+    int ARRAY_MAX_255 = 0xAE;
+    int ARRAY_MAX_65535 = 0xAF;
 
-    int DOUBLE_ZERO = 0x90;
-    int DOUBLE = 0x91;
+    int MAP_LEN_00 = 0xB0;
+    int MAP_LEN_0D = 0xBD;
+    int MAP_MAX_255 = 0xBE;
+    int MAP_MAX_65535 = 0xBF;
 
-    int DATE_MS = 0xA0;
-    int DATE_S = 0xA1;
-    int DATE_H = 0xA2;
+    int SYMBOL_ID_00 = 0xC0;
+    int SYMBOL_ID_2D = 0xED;
+    int SYMBOL_ID_2E_12D = 0xEE;
 
-    int BYTE_ARRAY_LEN_ZERO = 0xE0;
-    int BYTE_ARRAY_LEN_TEN = 0xEA;
-    int BYTE_ARRAY_MAX_255 = 0xEB;
-    int BYTE_ARRAY_MAX_65535 = 0xEC;
+    int NULL = 0xEF;
+
+    int BYTE_ARRAY_LEN_00 = 0xF0;
+    int BYTE_ARRAY_LEN_0D = 0xFD;
+    int BYTE_ARRAY_MAX_255 = 0xFE;
+    int BYTE_ARRAY_MAX_65535 = 0xFF;
 }

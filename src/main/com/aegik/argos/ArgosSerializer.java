@@ -13,15 +13,15 @@ public class ArgosSerializer
 {
     private final static int MAX_SYMBOL_LENGTH = 128;
     private final Map<String, Integer> m_symbols;
-    private final int m_maxSymbols;
     private final Calendar m_calendar;
+    private final int m_maxSymbols;
     private ByteArrayOutputStream m_stream;
 
-    public ArgosSerializer(int maxSymbols)
+    public ArgosSerializer()
     {
         m_calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        m_maxSymbols = maxSymbols;
-        m_symbols = new HashMap<String, Integer>(maxSymbols);
+        m_maxSymbols = ArgosProtocol.SYMBOL_ID_2D - ArgosProtocol.SYMBOL_ID_00 + 1 + 256;
+        m_symbols = new HashMap<String, Integer>(m_maxSymbols);
     }
 
     public ArgosSerializer begin()
@@ -96,7 +96,7 @@ public class ArgosSerializer
 
     private void addByte(byte[] bytes) throws IOException
     {
-        writeSize(bytes.length, ArgosProtocol.BYTE_ARRAY_LEN_ZERO, ArgosProtocol.BYTE_ARRAY_LEN_TEN);
+        writeSize(bytes.length, ArgosProtocol.BYTE_ARRAY_LEN_00, ArgosProtocol.BYTE_ARRAY_LEN_0D);
         m_stream.write(bytes);
     }
 
@@ -133,7 +133,7 @@ public class ArgosSerializer
     @SuppressWarnings({"unchecked"})
     private void addMap(Map map) throws IOException
     {
-        writeSize(map.size(), ArgosProtocol.MAP_LEN_ZERO, ArgosProtocol.MAP_LEN_TEN);
+        writeSize(map.size(), ArgosProtocol.MAP_LEN_00, ArgosProtocol.MAP_LEN_0D);
         for (Map.Entry entry : (Set<Map.Entry>) map.entrySet())
         {
             if (entry.getKey() instanceof String)
@@ -148,6 +148,19 @@ public class ArgosSerializer
         }
     }
 
+    private void writeSymbolToken(int symbol)
+    {
+        int symbolSingleTokenMax = ArgosProtocol.SYMBOL_ID_2D - ArgosProtocol.SYMBOL_ID_00;
+        if (symbol <= symbolSingleTokenMax)
+        {
+            m_stream.write(symbol + ArgosProtocol.SYMBOL_ID_00);
+        }
+        else
+        {
+            m_stream.write(ArgosProtocol.SYMBOL_ID_2E_12D);
+            m_stream.write(symbol - symbolSingleTokenMax - 1);
+        }
+    }
     private void addPossibleSymbol(String string) throws IOException
     {
         if (string.length() > MAX_SYMBOL_LENGTH)
@@ -164,19 +177,19 @@ public class ArgosSerializer
                 return;
             }
             symbol = m_symbols.size();
+            writeSymbolToken(symbol);
             m_symbols.put(string, symbol);
-            writeSize(symbol, ArgosProtocol.SYMBOL_ID_00, ArgosProtocol.SYMBOL_ID_2D);
             byte[] bytes = string.getBytes("UTF-8");
             writeInteger(1, bytes.length);
             m_stream.write(bytes);
             return;
         }
-        writeSize(symbol, ArgosProtocol.SYMBOL_ID_00, ArgosProtocol.SYMBOL_ID_2D);
+        writeSymbolToken(symbol);
     }
 
     private void addCollection(Collection collection)
     {
-        writeSize(collection.size(), ArgosProtocol.ARRAY_LEN_ZERO, ArgosProtocol.ARRAY_LEN_TEN);
+        writeSize(collection.size(), ArgosProtocol.ARRAY_LEN_00, ArgosProtocol.ARRAY_LEN_0D);
         for (Object o : collection)
         {
             add(o);
@@ -209,7 +222,7 @@ public class ArgosSerializer
     private void addString(String s) throws IOException
     {
         byte[] bytes = s.getBytes("UTF-8");
-        writeSize(bytes.length, ArgosProtocol.STRING_LEN_ZERO, ArgosProtocol.STRING_LEN_TEN);
+        writeSize(bytes.length, ArgosProtocol.STRING_LEN_00, ArgosProtocol.STRING_LEN_0D);
         m_stream.write(bytes);
     }
 
@@ -237,6 +250,7 @@ public class ArgosSerializer
         }
     }
 
+    @SuppressWarnings({"PointlessArithmeticExpression"})
     private void addInt(long integer)
     {
         if (integer == -1)
@@ -244,9 +258,15 @@ public class ArgosSerializer
             m_stream.write(ArgosProtocol.MINUS_ONE);
             return;
         }
-        else if (integer >= 0 && integer <= 14)
+        else if (integer >= 0 && integer <= ArgosProtocol.INT_7F - ArgosProtocol.INT_00)
         {
-            m_stream.write(ArgosProtocol.ZERO + (int) integer);
+            m_stream.write(ArgosProtocol.INT_00 + (int) integer);
+            return;
+        }
+        if (integer >= 128 && integer <=255)
+        {
+            m_stream.write(ArgosProtocol.ONE_BYTE_INTEGER);
+            writeInteger(1, integer - 128);
             return;
         }
         int byteLength = byteLength(integer);
