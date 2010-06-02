@@ -13,13 +13,11 @@ public class ArgosSerializer
 {
     private final static int MAX_SYMBOL_LENGTH = 128;
     private final Map<String, Integer> m_symbols;
-    private final Calendar m_calendar;
     private final int m_maxSymbols;
     private ByteArrayOutputStream m_stream;
 
     public ArgosSerializer()
     {
-        m_calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         m_maxSymbols = ArgosProtocol.SYMBOL_ID_2D - ArgosProtocol.SYMBOL_ID_00 + 1 + 256;
         m_symbols = new HashMap<String, Integer>(m_maxSymbols);
     }
@@ -102,21 +100,23 @@ public class ArgosSerializer
 
     private void addDate(Date date)
     {
-        m_calendar.setTime(date);
-        if (m_calendar.get(Calendar.MILLISECOND) != 0)
+        long time = date.getTime();
+        if (time % 1000 != 0)
         {
             m_stream.write(ArgosProtocol.DATE_MS);
-            writeInteger(8, date.getTime());
+            writeInteger(8, time);
             return;
         }
-        if (m_calendar.get(Calendar.SECOND) != 0 || m_calendar.get(Calendar.MINUTE) != 0)
+        time = time / 1000;
+        if (time % 3600 != 0)
         {
             m_stream.write(ArgosProtocol.DATE_S);
-            writeInteger(5, date.getTime() / 1000);
+            writeInteger(5, time);
             return;
         }
+        time = time / 3600;
         m_stream.write(ArgosProtocol.DATE_H);
-        writeInteger(3, date.getTime() / 3600000);
+        writeInteger(3, time);
     }
 
     private void addDouble(Double aDouble)

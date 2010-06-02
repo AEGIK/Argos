@@ -117,10 +117,14 @@ import java.text.SimpleDateFormat;
     public void testAddDate() throws Exception
     {
         assertSerialization(new Date());
-        SimpleDateFormat format = new SimpleDateFormat("MMddHHmmss");
-        assertSerialization(format.parse("0420123012"));
-        assertSerialization(format.parse("0420123000"));
-        assertSerialization(format.parse("0420120000"));
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+        assertSerialization(format.parse("25990420123012"));
+        assertSerialization(format.parse("25990420123000"));
+        assertSerialization(format.parse("25990420120000"));
+        assertSerialization(format.parse("25990420123012"));
+        assertSerialization(format.parse("25990420123000"));
+        assertSerialization(format.parse("25990420120000"));
+        System.out.println(new Date(950151404 * 1000L));
     }
     public void testAddMap() throws Exception
     {
