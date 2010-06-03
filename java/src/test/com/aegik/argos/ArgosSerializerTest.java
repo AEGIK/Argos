@@ -67,6 +67,19 @@ import java.text.SimpleDateFormat;
         assertEquals(hex, builder.toString());
     }
 
+    public void testSerializable()
+    {
+        Object o = new ArgosSerializable()
+        {
+            public Object toSerializableForm()
+            {
+                return 255;
+            }
+        };
+        m_argosSerializer.begin().add(o);
+        compareBytes("887F");
+
+    }
     public void testLongString() throws Exception
     {
         m_argosSerializer.begin();
@@ -82,13 +95,13 @@ import java.text.SimpleDateFormat;
     public void testAddByte() throws Exception
     {
         m_argosSerializer.begin().add((byte)-128);
-        assertEquals(-128L, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
+        assertEquals(-128, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
     }
 
     public void testAddShort() throws Exception
     {
         m_argosSerializer.begin().add((short)-128);
-        assertEquals(-128L, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
+        assertEquals(-128, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
     }
 
     public void assertSerialization(Object o) throws Exception
@@ -135,11 +148,11 @@ import java.text.SimpleDateFormat;
         {
             if (i % 2 == 0)
             {
-                map.put(i + "", (long)i * i);
+                map.put(i + "", i * i);
             }
             else
             {
-                map.put((long)i, (long)- i * i);
+                map.put(i, - i * i);
             }
             assertSerialization(map);
         }
@@ -175,23 +188,23 @@ import java.text.SimpleDateFormat;
     {
         List<Object> list = new ArrayList<Object>();
         list.add("Test");
-        list.add(1L);
+        list.add(1);
         List<Object> list2 = new ArrayList<Object>();
-        list2.add(10L);
+        list2.add(10);
         list.add(list2);
         assertSerialization(list);
         assertSerialization(new ArrayList());
         ArrayList newList = new ArrayList();
         for (int i = 0; i < 10; i++)
         {
-            newList.add((long)i * i);
+            newList.add(i * i);
         }
         assertSerialization(newList);
         newList.add("Test");
         assertSerialization(newList);
         for (int i = 0; i < 250; i++)
         {
-            newList.add(-(long) i * i);
+            newList.add(- i * i);
             assertSerialization(newList);
         }
     }
@@ -202,11 +215,11 @@ import java.text.SimpleDateFormat;
         {
             m_argosSerializer.begin().add(i);
             compareBytes(toHex(i));
-            assertEquals((long)i, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
+            assertEquals(i, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
         }
         m_argosSerializer.begin().add(-1);
         compareBytes("87");
-        assertEquals(-1L, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
+        assertEquals(-1, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
         m_argosSerializer.begin().add(255);
         compareBytes("887F");
         m_argosSerializer.begin().add(-128);
@@ -225,11 +238,31 @@ import java.text.SimpleDateFormat;
                 maxHex += "FF";
             }
             m_argosSerializer.begin().add(valueMax);
+            System.out.println(valueMax + " " + ((Long)valueMax).getClass());
+            System.out.println(m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())).getClass());
             compareBytes("8" + HEX[i + 7] + maxHex);
-            assertEquals(valueMax, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
+            assertEquals(valueMax, ((Number)m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize()))).longValue());
             m_argosSerializer.begin().add(valueMin);
             compareBytes("8" + HEX[i + 7] + minHex);
-            assertEquals(valueMin, m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
+            assertEquals(valueMin, ((Number)m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize()))).longValue());
+        }
+        for (int i = 5; i <= 8; i++)
+        {
+            long valueMax = (1L << (8 * (i - 1) + 7)) - 1;
+            long valueMin = -(1L << (8 * (i - 1) + 7));
+            String minHex = "80";
+            String maxHex = "7F";
+            for (int j = 1; j < i; j++)
+            {
+                minHex += "00";
+                maxHex += "FF";
+            }
+            m_argosSerializer.begin().add(valueMax);
+            compareBytes("8" + HEX[i + 7] + maxHex);
+            assertEquals((Long)valueMax, (Long)m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
+            m_argosSerializer.begin().add(valueMin);
+            compareBytes("8" + HEX[i + 7] + minHex);
+            assertEquals((Long)valueMin, (Long)m_argosDeserializer.deserialize(new ByteArrayInputStream(m_argosSerializer.serialize())));
         }
     }
 

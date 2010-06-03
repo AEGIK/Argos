@@ -30,6 +30,10 @@ public class ArgosSerializer
 
     public ArgosSerializer add(Object object)
     {
+        if (object != null && object instanceof ArgosSerializable)
+        {
+            object = ((ArgosSerializable)object).toSerializableForm();
+        }
         try
         {
             if (object == null)
@@ -242,7 +246,7 @@ public class ArgosSerializer
         return 8;
     }
 
-    private void writeInteger(int byteLength, long integer)
+    public void writeInteger(int byteLength, long integer)
     {
         for (int i = byteLength - 1; i >= 0; i--)
         {

@@ -14,10 +14,22 @@ public class ArgosDeserializer
 {
     private final Map<Integer, String> m_symbols;
     private InputStream m_stream;
+    private final ObjectFactory m_objectFactory;
+
+    public ArgosDeserializer(ObjectFactory objectFactory)
+    {
+        m_symbols = new HashMap<Integer, String>();
+        m_objectFactory = objectFactory;
+    }
 
     public ArgosDeserializer()
     {
-        m_symbols = new HashMap<Integer, String>();
+        this(DefaultObjectFactory.DEFAULT);
+    }
+
+    public void begin(InputStream stream)
+    {
+        m_stream = stream;
     }
 
     public Object deserialize(InputStream stream) throws IOException
@@ -26,7 +38,7 @@ public class ArgosDeserializer
         return deserialize();
     }
 
-    private Object deserialize() throws IOException
+    public Object deserialize() throws IOException
     {
         int prefix = m_stream.read();
         switch (prefix)
@@ -40,7 +52,7 @@ public class ArgosDeserializer
             case ArgosProtocol.FALSE:
                 return false;
             case ArgosProtocol.MINUS_ONE:
-                return -1L;
+                return -1;
             case ArgosProtocol.STRING_LEN_MAX_255:
                 return readString((int)readUnsignedInteger(1));
             case ArgosProtocol.STRING_LEN_MAX_65535:
@@ -60,11 +72,11 @@ public class ArgosDeserializer
             case ArgosProtocol.DOUBLE:
                 return readDouble();
             case ArgosProtocol.DATE_MS:
-                return new Date(readInteger(8));
+                return m_objectFactory.newDate(readInteger(8).longValue());
             case ArgosProtocol.DATE_S:
-                return new Date(readInteger(5) * 1000);
+                return m_objectFactory.newDate(readInteger(5).longValue() * 1000);
             case ArgosProtocol.DATE_H:
-                return new Date(readInteger(3) * 3600000);
+                return m_objectFactory.newDate(readInteger(3).longValue() * 3600000);
             case ArgosProtocol.BYTE_ARRAY_MAX_255:
                 return readBytes((int)readUnsignedInteger(1));
             case ArgosProtocol.BYTE_ARRAY_MAX_65535:
@@ -86,14 +98,14 @@ public class ArgosDeserializer
     {
         if (prefix >= ArgosProtocol.INT_00 && prefix <= ArgosProtocol.INT_7F)
         {
-            return (long)prefix - ArgosProtocol.INT_00;
+            return prefix - ArgosProtocol.INT_00;
         }
         else if (prefix >= ArgosProtocol.ONE_BYTE_INTEGER && prefix <= ArgosProtocol.EIGHT_BYTES_INTEGER)
         {
-            long value = readInteger(prefix - ArgosProtocol.ONE_BYTE_INTEGER + 1);
-            if (prefix == ArgosProtocol.ONE_BYTE_INTEGER && value >= 0)
+            Number value = readInteger(prefix - ArgosProtocol.ONE_BYTE_INTEGER + 1);
+            if (prefix == ArgosProtocol.ONE_BYTE_INTEGER && value.intValue() >= 0)
             {
-                return value + 128;
+                return value.intValue() + 128;
             }
             return value;
         }
@@ -133,9 +145,10 @@ public class ArgosDeserializer
         return symbol;
     }
 
+    @SuppressWarnings({"unchecked"})
     private Map readMap(int size) throws IOException
     {
-        Map<Object, Object> map = new HashMap<Object, Object>();
+        Map map = m_objectFactory.newMap(size);
         for (int i = 0; i < size; i++)
         {
             map.put(deserialize(), deserialize());
@@ -146,7 +159,7 @@ public class ArgosDeserializer
     @SuppressWarnings({"unchecked"})
     private List readArray(int size) throws IOException
     {
-        List<Object> list = new ArrayList<Object>(size);
+        List list = m_objectFactory.newList(size);
         for (int i = 0; i < size; i++)
         {
             list.add(deserialize());
@@ -164,10 +177,10 @@ public class ArgosDeserializer
 
     private Double readDouble() throws IOException
     {
-        return Double.longBitsToDouble(readInteger(8));
+        return Double.longBitsToDouble(readUnsignedInteger(8));
     }
 
-    private long readUnsignedInteger(int byteLength) throws IOException
+    public long readUnsignedInteger(int byteLength) throws IOException
     {
         long value = 0;
         for (int i = 0; i < byteLength; i++)
@@ -177,7 +190,7 @@ public class ArgosDeserializer
         return value ;
     }
 
-    private long readInteger(int byteLength) throws IOException
+    private Number readInteger(int byteLength) throws IOException
     {
         long value = readUnsignedInteger(byteLength);
         if (byteLength < 8)
@@ -187,6 +200,10 @@ public class ArgosDeserializer
             {
                 value = -(1L << (8 * byteLength)) + value;
             }
+        }
+        if (value >= Integer.MIN_VALUE && value <= Integer.MAX_VALUE)
+        {
+            return (int)value;
         }
         return value;
     }
