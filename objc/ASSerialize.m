@@ -25,6 +25,7 @@ static int MAX_SYMBOL_LENGTH = 128;
 - (void)dealloc
 {
 	[symbolList release];
+	[currentData release];
 	[super dealloc];
 }
 
@@ -175,7 +176,7 @@ static int MAX_SYMBOL_LENGTH = 128;
 	[self writeSize:[list count] zeroSize:AS_ARRAY_LEN_00 maxSize:AS_ARRAY_LEN_0D];
 	for (id object in list)
 	{
-		[self serializeInner:object];
+		[self add:object];
 	}
 }
 
@@ -196,10 +197,10 @@ static int MAX_SYMBOL_LENGTH = 128;
 		}
 		else 
 		{
-			[self serializeInner:key];
+			[self add:key];
 		}
 
-		[self serializeInner:[dictionary objectForKey:key]];
+		[self add:[dictionary objectForKey:key]];
 	}
 }
 
@@ -224,7 +225,7 @@ static int MAX_SYMBOL_LENGTH = 128;
 	[self writeInteger:3 value:time];
 }
 
-- (void)serializeInner:(id)object
+- (void)add:(id)object
 {
 	if (object == nil || object == [NSNull null])
 	{
@@ -271,11 +272,25 @@ static int MAX_SYMBOL_LENGTH = 128;
 		NSAssert1(false, @"Illegal object for serialization %@", object);
 	}
 }
+
+- (void)begin
+{
+	currentData = [[NSMutableData alloc] init];	
+}
+
+
+- (NSData *)serialize
+{
+	NSData *data = [currentData autorelease];
+	currentData = nil;
+	return data;
+}
+
 - (NSData *)serialize:(NSObject *)object
 {
-	currentData = [NSMutableData data];
-	[self serializeInner:object];
-	return currentData;
+	[self begin];
+	[self add:object];
+	return [self serialize];
 }
 
 @end

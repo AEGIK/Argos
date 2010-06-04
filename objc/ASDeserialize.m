@@ -80,7 +80,7 @@
 	NSMutableArray *array = [NSMutableArray arrayWithCapacity:length];
 	for (int i = 0; i < length; i++)
 	{
-		[array addObject:[self deserializeInner]];
+		[array addObject:[self deserialize]];
 	}
 	return array;
 }
@@ -110,13 +110,13 @@
 	NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithCapacity:length];
 	for (int i = 0; i < length; i++)
 	{
-		id key = [self deserializeInner];
-		id value = [self deserializeInner];
+		id key = [self deserialize];
+		id value = [self deserialize];
 		[dictionary setObject:value forKey:key];
 	}
 	return dictionary;
 }
-- (NSObject *)deserializeInner
+- (NSObject *)deserialize
 {
 	if (currentPointer == endPointer) return nil;
 	uint8_t value = *currentPointer++;
@@ -193,11 +193,16 @@
 	return nil;
 }
 
-- (NSObject *)deserialize:(NSData *)data
+- (void)begin:(NSData *)data
 {
 	currentPointer = (uint8_t *)[data bytes];
-	endPointer = (uint8_t *)([data bytes] + [data length]);
-	return [self deserializeInner];
+	endPointer = (uint8_t *)([data bytes] + [data length]);	
+}
+
+- (NSObject *)deserialize:(NSData *)data
+{
+	[self begin:data];
+	return [self deserialize];
 }
 
 @end

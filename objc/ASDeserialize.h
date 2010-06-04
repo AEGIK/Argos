@@ -15,7 +15,8 @@
 	uint8_t *endPointer;
 	NSMutableDictionary *symbolList;
 }
-- (NSObject *)deserializeInner;
+- (void)begin:(NSData *)data;
+- (NSObject *)deserialize;
 - (NSObject *)deserialize:(NSData *)data;
 
 @end
