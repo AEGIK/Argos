@@ -51,6 +51,7 @@ typedef enum _ASProtocol
 	NSMutableData *currentData;
 }
 
+- (void)writeInteger:(int)byteWidth value:(int64_t)value;
 - (void)begin;
 - (void)add:(id)object;
 - (NSData *)serialize;

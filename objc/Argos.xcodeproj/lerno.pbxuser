@@ -105,6 +105,7 @@
 			A972777411B8FA28005C5301 = A972777411B8FA28005C5301 /* PBXTextBookmark */;
 			A972778B11B8FF80005C5301 /* PBXTextBookmark */ = A972778B11B8FF80005C5301 /* PBXTextBookmark */;
 			A972778C11B8FF80005C5301 /* PBXTextBookmark */ = A972778C11B8FF80005C5301 /* PBXTextBookmark */;
+			A972779811B8FFA5005C5301 /* PBXTextBookmark */ = A972779811B8FFA5005C5301 /* PBXTextBookmark */;
 			A9B3F34111B5955B00E00470 = A9B3F34111B5955B00E00470 /* PBXTextBookmark */;
 			A9CA767611B665E5006F89EC = A9CA767611B665E5006F89EC /* PBXTextBookmark */;
 		};
@@ -154,7 +155,7 @@
 		fRef = A9B3F19B11B52BF600E00470 /* ASSerialize.h */;
 		name = "ASSerialize.h: 55";
 		rLen = 0;
-		rLoc = 1263;
+		rLoc = 1321;
 		rType = 0;
 		vrLen = 826;
 		vrLoc = 482;
@@ -194,9 +195,19 @@
 		fRef = A9B3F19B11B52BF600E00470 /* ASSerialize.h */;
 		name = "ASSerialize.h: 54";
 		rLen = 0;
-		rLoc = 1227;
+		rLoc = 1285;
 		rType = 0;
 		vrLen = 836;
+		vrLoc = 482;
+	};
+	A972779811B8FFA5005C5301 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = A9B3F19B11B52BF600E00470 /* ASSerialize.h */;
+		name = "ASSerialize.h: 54";
+		rLen = 0;
+		rLoc = 1270;
+		rType = 0;
+		vrLen = 893;
 		vrLoc = 482;
 	};
 	A9B3F15211B5287800E00470 /* Source Control */ = {
@@ -233,9 +244,9 @@
 	};
 	A9B3F19B11B52BF600E00470 /* ASSerialize.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {972, 840}}";
-			sepNavSelRange = "{1227, 0}";
-			sepNavVisRange = "{482, 836}";
+			sepNavIntBoundsRect = "{{0, 0}, {972, 854}}";
+			sepNavSelRange = "{1270, 0}";
+			sepNavVisRange = "{482, 893}";
 			sepNavWindowFrame = "{{38, 24}, {1124, 978}}";
 		};
 	};
