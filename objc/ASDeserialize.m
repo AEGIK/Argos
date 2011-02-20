@@ -15,7 +15,7 @@
 
 - (id)init
 {
-	if (self = [super init])
+	if ((self = [super init]))
 	{
 		int maxSymbols = AS_SYMBOL_ID_2D - AS_SYMBOL_ID_00 + 1 + 256;
 		symbolList = [[NSMutableDictionary alloc] initWithCapacity:maxSymbols];
@@ -48,7 +48,7 @@
 
 - (NSNumber *)readInteger:(int)bytes
 {
-	NSAssert(bytes > 0, @"Zero or less bytes read");
+	NSAssert1(bytes > 0, @"Zero or less bytes read %d", bytes);
 	int64_t value = [self readUnsignedInteger:bytes];
 	if (bytes < 8)
 	{
@@ -70,15 +70,17 @@
 
 - (NSString *)readString:(uint64_t)length
 {
-	NSString *string = [[NSString alloc] initWithBytes:currentPointer length:length encoding:NSUTF8StringEncoding];
+	NSString *string = [[NSString alloc] initWithBytes:currentPointer 
+                                                length:(NSUInteger)length 
+                                              encoding:NSUTF8StringEncoding];
 	currentPointer += length;
 	return [string autorelease];
 }
 
 - (NSArray *)readList:(uint64_t)length
 {
-	NSMutableArray *array = [NSMutableArray arrayWithCapacity:length];
-	for (int i = 0; i < length; i++)
+	NSMutableArray *array = [NSMutableArray arrayWithCapacity:(NSUInteger) length];
+	for (NSUInteger i = 0; i < length; i++)
 	{
 		[array addObject:[self deserialize]];
 	}
@@ -87,11 +89,11 @@
 
 - (NSString *)readSymbol:(uint64_t)symbolId
 {
-	id key = [NSNumber numberWithInt:symbolId];
+	id key = [NSNumber numberWithInt:(int)symbolId];
 	NSString *symbol = [symbolList objectForKey:key];
 	if (symbol == nil)
 	{
-		int length = [self readUnsignedInteger:1];
+		int length = (int)[self readUnsignedInteger:1];
 		symbol = [self readString:length];
 		[symbolList setObject:symbol forKey:key];
 	}
@@ -100,15 +102,15 @@
 
 - (NSData *)readData:(uint64_t)length
 {
-	NSData *data = [NSData dataWithBytes:currentPointer length:length];
+	NSData *data = [NSData dataWithBytes:currentPointer length:(NSUInteger) length];
 	currentPointer += length;
 	return data;
 }
 
 - (NSDictionary *)readDictionary:(uint64_t)length
 {
-	NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithCapacity:length];
-	for (int i = 0; i < length; i++)
+	NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithCapacity:(NSUInteger) length];
+	for (NSUInteger i = 0; i < length; i++)
 	{
 		id key = [self deserialize];
 		id value = [self deserialize];
@@ -116,7 +118,7 @@
 	}
 	return dictionary;
 }
-- (NSObject *)deserialize
+- (id)deserialize
 {
 	if (currentPointer == endPointer) return nil;
 	uint8_t value = *currentPointer++;
@@ -199,7 +201,7 @@
 	endPointer = (uint8_t *)([data bytes] + [data length]);	
 }
 
-- (NSObject *)deserialize:(NSData *)data
+- (id)deserialize:(NSData *)data
 {
 	[self begin:data];
 	return [self deserialize];
