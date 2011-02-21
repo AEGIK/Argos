@@ -8,38 +8,32 @@
 
 #import "ASSerialize.h"
 
-static int MAX_SYMBOL_LENGTH = 128;
+static NSUInteger MAX_SYMBOL_LENGTH = 128;
 
 @implementation ASSerialize
 
-- (id)init
-{
-	if (self = [super init])
-	{
+- (id)init {
+	if ((self = [super init])) {
 		maxSymbols = AS_SYMBOL_ID_2D - AS_SYMBOL_ID_00 + 1 + 256;
 		symbolList = [[NSMutableDictionary alloc] initWithCapacity:maxSymbols];
 	}
 	return self;
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
 	[symbolList release];
 	[currentData release];
 	[super dealloc];
 }
 
-- (void)addByte:(uint8_t)toAdd
-{
+- (void)addByte:(uint8_t)toAdd {
 	uint8_t b[1];
 	b[0] = toAdd;
 	[currentData appendBytes:b length:1];	
 }
 
-- (void)writeInteger:(int)byteWidth value:(int64_t)value
-{
-	for (int i = byteWidth - 1; i >= 0; i--)
-	{
+- (void)writeInteger:(int)byteWidth value:(int64_t)value {
+	for (int i = byteWidth - 1; i >= 0; i--) {
 		[self addByte:(0xFF & (value >> (i * 8)))];
 	}		
 }

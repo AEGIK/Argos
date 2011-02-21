@@ -120,24 +120,24 @@
 	NSCalendar *calendar = [NSCalendar currentCalendar];
 	NSDate *date = [calendar dateFromComponents:dateComponents];
 	[self compareSerialize:date];
-	date = [date addTimeInterval:60];
+	date = [date dateByAddingTimeInterval:60];
 	[self compareSerialize:date];
-	date = [date addTimeInterval:4];
+	date = [date dateByAddingTimeInterval:4];
 	[self compareSerialize:date];
-	date = [date addTimeInterval:4.5];
+	date = [date dateByAddingTimeInterval:4.5];
 	[self compareSerialize:date];
 }
 
 - (void)testSerializeDict2
 {
 	NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-	uint8_t b[] = { 0xB3, 0xC0, 0x01, 0x61, 0x01, 0xC1, 0x01, 0x63, 0xEF, 0xC2, 0x01, 0x62, 0xA3, 0x0B, 0x16, 0x21 };
+	uint8_t b[] = { 0xB3, 0xC0, 0x01, 0x61, 0x01, 0xC1, 0x01, 0x62, 0xA3, 0x0B, 0x16, 0x21, 0xC2, 0x01, 0x63, 0xEF };
 	// {"a": 1, "b": [11, 22, 33], "c": null }
 	[dict setObject:[NSNumber numberWithInt:1] forKey:@"a"];
 	[dict setObject:[NSArray arrayWithObjects:[NSNumber numberWithInt:11], [NSNumber numberWithInt:22], [NSNumber numberWithInt:33], nil] forKey:@"b"];
 	[dict setObject:[NSNull null] forKey:@"c"];
 	[self compare:dict bytes:b length:16];
-	uint8_t b2[] = { 0xB3, 0xC0, 0x01, 0xC1, 0xEF, 0xC2, 0xA3, 0x0B, 0x16, 0x21 };
+	uint8_t b2[] = { 0xB3, 0xC0, 0x01, 0xC1, 0xA3, 0x0B, 0x16, 0x21, 0xC2, 0xEF };
 	[self compare:dict bytes:b2 length:10];
 }
 

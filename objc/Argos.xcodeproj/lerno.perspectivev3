@@ -305,6 +305,8 @@
 			<key>Layout</key>
 			<array>
 				<dict>
+					<key>BecomeActive</key>
+					<true/>
 					<key>ContentConfiguration</key>
 					<dict>
 						<key>PBXBottomSmartGroupGIDs</key>
@@ -388,14 +390,12 @@
 					<key>Dock</key>
 					<array>
 						<dict>
-							<key>BecomeActive</key>
-							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
 								<string>A9B3F14C11B5287800E00470</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>ASSerialize.h</string>
+								<string>ASSerialize.m</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -403,11 +403,11 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>A9B3F14D11B5287800E00470</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>ASSerialize.h</string>
+										<string>ASSerialize.m</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>A972779811B8FFA5005C5301</string>
+										<string>A972784F11B91D04005C5301</string>
 										<key>history</key>
 										<array>
 											<string>A9B3F34111B5955B00E00470</string>
@@ -415,8 +415,8 @@
 											<string>A972773B11B8F8C0005C5301</string>
 											<string>A972773D11B8F8C0005C5301</string>
 											<string>A972775E11B8F989005C5301</string>
+											<string>A972784E11B91D04005C5301</string>
 											<string>A972778B11B8FF80005C5301</string>
-											<string>A972777211B8FA28005C5301</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -737,7 +737,7 @@
 	<key>StatusbarIsVisible</key>
 	<true/>
 	<key>TimeStamp</key>
-	<real>297336741.490022</real>
+	<real>297344260.64984101</real>
 	<key>ToolbarConfigUserDefaultsMinorVersion</key>
 	<string>2</string>
 	<key>ToolbarDisplayMode</key>

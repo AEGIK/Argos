@@ -16,7 +16,8 @@
 	NSMutableDictionary *symbolList;
 }
 - (void)begin:(NSData *)data;
-- (NSObject *)deserialize;
-- (NSObject *)deserialize:(NSData *)data;
+- (uint64_t)readUnsignedInteger:(int)bytes;
+- (id)deserialize;
+- (id)deserialize:(NSData *)data;
 
 @end
