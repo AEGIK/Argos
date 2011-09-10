@@ -78,7 +78,6 @@ import java.text.SimpleDateFormat;
         };
         m_argosSerializer.begin().add(o);
         compareBytes("887F");
-
     }
     public void testLongString() throws Exception
     {
