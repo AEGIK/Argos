@@ -1,7 +1,7 @@
 package com.aegik.argos;
 
 /**
- * Undocumented Class
+ * Specification of the ARGOS object codes.
  *
  * @author Christoffer Lerno
  */

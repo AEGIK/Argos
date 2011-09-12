@@ -1,6 +1,6 @@
 package com.aegik.argos;
 /**
- * Undocumented Class
+ * Test of Serializer
  *
  * @author Christoffer Lerno
  */
