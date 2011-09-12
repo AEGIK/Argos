@@ -3,7 +3,8 @@ package com.aegik.argos;
 import java.util.*;
 
 /**
- * Undocumented Class
+ * Default object factory returns hash maps as object representations and array lists as list representations.
+ * Dates are constructed using default Date.
  *
  * @author Christoffer Lerno
  */

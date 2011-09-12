@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.EOFException;
 
 /**
- * Undocumented Class
+ * Deserializer for Argos, containing symbol state.
  *
  * @author Christoffer Lerno
  */
@@ -98,6 +98,7 @@ public class ArgosDeserializer
     {
         if (prefix >= ArgosProtocol.INT_00 && prefix <= ArgosProtocol.INT_7F)
         {
+            //noinspection PointlessArithmeticExpression
             return prefix - ArgosProtocol.INT_00;
         }
         else if (prefix >= ArgosProtocol.ONE_BYTE_INTEGER && prefix <= ArgosProtocol.EIGHT_BYTES_INTEGER)

@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * Undocumented Class
+ * Serializer for Argos, keeps symbol state.
  *
  * @author Christoffer Lerno
  */
